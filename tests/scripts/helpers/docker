@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# docker stub for bats tests
+echo "$*" >> "${DOCKER_CALLS_LOG:?}"
+if [ "$1 $2 $3 $4" = "buildx imagetools inspect --raw" ]; then
+  cat "${DOCKER_MANIFEST_FIXTURE:?}"
+  exit "${DOCKER_INSPECT_EXIT:-0}"
+fi
+exit 0

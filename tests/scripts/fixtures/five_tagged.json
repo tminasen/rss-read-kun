@@ -1,0 +1,7 @@
+[
+  {"package":"gcr.io/test-proj/rss-read-kun","version":"sha256:1111111111111111111111111111111111111111111111111111111111111111","tags":"sha1","createTime":"2026-10-01T00:00:00Z"},
+  {"package":"gcr.io/test-proj/rss-read-kun","version":"sha256:2222222222222222222222222222222222222222222222222222222222222222","tags":"sha2","createTime":"2026-10-02T00:00:00Z"},
+  {"package":"gcr.io/test-proj/rss-read-kun","version":"sha256:3333333333333333333333333333333333333333333333333333333333333333","tags":"sha3","createTime":"2026-10-03T00:00:00Z"},
+  {"package":"gcr.io/test-proj/rss-read-kun","version":"sha256:4444444444444444444444444444444444444444444444444444444444444444","tags":"sha4","createTime":"2026-10-04T00:00:00Z"},
+  {"package":"gcr.io/test-proj/rss-read-kun","version":"sha256:5555555555555555555555555555555555555555555555555555555555555555","tags":"sha5","createTime":"2026-10-05T00:00:00Z"}
+]
