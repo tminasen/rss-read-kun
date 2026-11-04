@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# gcloud stub for bats tests
+echo "$*" >> "${GCLOUD_CALLS_LOG:?}"
+case "$1 $2 $3 $4" in
+  "artifacts docker images list")
+    cat "${GCLOUD_LIST_FIXTURE:?}"
+    exit "${GCLOUD_LIST_EXIT:-0}"
+    ;;
+  "artifacts docker images delete")
+    if [ -n "${GCLOUD_DELETE_FAIL_DIGEST:-}" ] && [[ "$*" == *"$GCLOUD_DELETE_FAIL_DIGEST"* ]]; then
+      exit 1
+    fi
+    exit 0
+    ;;
+esac
+exit 0

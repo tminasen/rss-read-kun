@@ -9,7 +9,12 @@ jobs:
   check_pull_request:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@1.85.1
+      - name: test scripts
+        run: npx --yes bats@1.13.0 tests/scripts
+      - name: lint scripts
+        run: npx --yes shellcheck@4.1.0 scripts/*.sh tests/scripts/helpers/gcloud tests/scripts/helpers/docker
       - name: test
         run: DISCORD_WEBHOOK_URL=${{secrets.RSS_WEBHOOK}} cargo test --verbose
       - name: notice-failure

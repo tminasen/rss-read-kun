@@ -1,3 +1,5 @@
 target
 .idea
 .github
+# google-github-actions/auth が書き出す SA キーをイメージに入れない
+gha-creds-*.json

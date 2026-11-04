@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+# deploy と古いイメージの削除が run どうしで並行しないよう、順番に実行する
+concurrency:
+  group: push-main-deploy
+  cancel-in-progress: false
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT }}
   SERVICE: rss-read-kun
@@ -12,26 +16,29 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_KEY }}
 
       - name: Setup Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.2.0
+        uses: google-github-actions/setup-gcloud@v3
         with:
           project_id: ${{ env.PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_KEY }}
-          export_default_credentials: true  # Set to true to authenticate the Cloud Run action
-      
+
       - name: Authorize Docker push
-        run: gcloud auth configure-docker
+        run: gcloud auth configure-docker gcr.io --quiet
 
       - name: build and push
         run: |-
-          docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} ./
+          docker build --provenance=false --sbom=false -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} ./
           docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
         
       - name: deploy to cloud run
         id: deploy
-        uses: google-github-actions/deploy-cloudrun@v2
+        uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ env.SERVICE }}
           image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
@@ -41,6 +48,10 @@ jobs:
             GEMINI_API_KEY=${{secrets.GEMINI_API_KEY}}
             GEMINI_MODEL=gemini-3.8-flash
             SUMMARY_PROMPT=${{secrets.SUMMARY_PROMPT}}
+
+      - name: delete old images
+        run: ./scripts/cleanup_old_images.sh "gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}" "${{ github.sha }}"
+
       - name: notice-failure
         if: failure()
         run: |
